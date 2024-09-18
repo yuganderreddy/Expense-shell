@@ -6,15 +6,6 @@ G="\e[32m"
 N="\e[0m"
 Y="\e[33m"
 
-#dnf install mysql-server -y
-# if [ $? -ne 0 ]
-# then
-#     echo -e "$R mysql is not installed, going to install...$N"
-#     dnf install mysql-server -y
-# else
-#     echo -e "$G mysql is already installed, no worries...$N"
-# fi
-
 LOGS_FOLDER="/var/log/expense"
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
 TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
@@ -53,5 +44,12 @@ VALIDATE $? "Enabling MySQL Server"
 systemctl start mysqld &>>$LOG_FILE
 VALIDATE $? "Starting MySQL Server"
 
-mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOG_FILE
-VALIDATE $? "Setting up root password for MySQL Server"
+mysql -h mysql.yuganderreddym.online -u root -pExpenseApp@1 -e 'show databases;' &>>$LOG_FILE
+if [ $? -ne 0 ]
+then
+    echo "mysql root password is not setup, setting now...." &>>$LOG_FILE
+    mysql_secure_installation --set-root-pass ExpenseApp@1
+    VALIDATE $? "Setting up root password for MySQL Server"
+else
+    echo -e "mysql root password is already setup... $Y SKIPPING $N" | tee -a $LOG_FILE
+fi
