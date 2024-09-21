@@ -55,4 +55,12 @@ else
 fi
 
 mkdir -p /app
-VALIDATE $? "created app directory"
+VALIDATE $? "created /app directory"
+
+curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>$LOG_FILE
+VALIDATE $? "downloaded the backend application code to temp directory"
+
+cd /app
+
+unzip /tmp/backend.zip &>>$LOG_FILE
+VALIDATE $? "Extracting the backend application code to temp directory"
